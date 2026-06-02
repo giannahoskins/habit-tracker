@@ -1,5 +1,5 @@
 import type {Habit} from "../types"
-import {useState} from "react"
+import React, {useState} from "react"
 
 interface CalendarProps {
     habits: Habit[],
@@ -22,27 +22,26 @@ function Calendar({habits, onDeleteHabit, onCompleteHabit}: CalendarProps) {
 
     return (
         <>
-            <div id="month_header_container" className="flex">
+            <div id="month_header_container" className="flex justify-between max-w-200 items-center mx-auto my-5">
                 <button className="navigation-button prev" onClick={handlePrevMonth}>←</button>
-                <h2 id="month" className="font-display">{currentDate.toLocaleString('default', {month: 'long', year: 'numeric'})}</h2>
+                <h2 id="month" className="font-display text-3xl xl:text-6xl lg:text-5xl md:text-4xl">{currentDate.toLocaleString('default', {month: 'long', year: 'numeric'})}</h2>
                 <button className="navigation-button next" onClick={handleNextMonth}>→</button>
             </div>
-            <div id="habit_grid">
-                <div id="days_row" className="grid grid-cols-[auto_repeat(31,1fr)]">
-                    {days.map(day => <div className="day" key={day}><span>{day}</span></div>)}
-                </div>
+            <div id="habit_grid" className="grid border-t border-l border-subtle" style={{ gridTemplateColumns: `200px repeat(${daysInMonth}, 1fr)` }}>
+                <div className="border-r border-b border-subtle"></div>
+                {days.map(day => <div className="day flex items-center justify-center border-r border-b border-subtle" key={day}><span>{day}</span></div>)}
                 {habits.map(habit => (
-                    <div key={habit.id} className="habit-row">
-                        <div className="habit-grid-name">{habit.name}</div>
+                    <React.Fragment key={habit.id}>
+                        <div className="habit-grid-name border-r border-b border-subtle">{habit.name}</div>
                         {days.map(day => {
                             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`
                             return (
-                                <div className="habit-cell" key={day} onClick={() => onCompleteHabit(habit.id, date)}>
+                                <div className="habit-cell flex items-center justify-center border-r border-b border-subtle" key={day} onClick={() => onCompleteHabit(habit.id, date)}>
                                     {habit.completedDates.includes(date) ? '✓' : ''}
                                 </div>
                             )
                         })}
-                    </div>
+                    </React.Fragment>
                 ))}
             </div>
         </>

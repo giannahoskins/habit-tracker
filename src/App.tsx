@@ -12,6 +12,8 @@ function App() {
     }
   })
 
+  const [isAddingHabit, setIsAddingHabit] = useState(false)
+
   function handleAddHabit(habitName: string) {
     const newHabit: Habit = {
       id: crypto.randomUUID(),
@@ -38,8 +40,15 @@ function App() {
 
   return (
     <div className="bg-background min-h-screen text-text">
-      <AddHabitForm onAddHabit={handleAddHabit}/>
-      <Calendar habits={habits} onDeleteHabit={handleDeleteHabit} onCompleteHabit={handleCompleteHabit} />
+      <h1>Habit Tracker</h1>
+      {habits.length === 0 && !isAddingHabit ? (
+        <div>
+          <p>No habits have been added yet. Click '+' to add a habit</p>
+          <button onClick={() => setIsAddingHabit(true)}>+</button>
+        </div>
+      ) : (
+        <Calendar habits={habits} onDeleteHabit={handleDeleteHabit} onCompleteHabit={handleCompleteHabit} />
+      )}
     </div>
   )
 }
