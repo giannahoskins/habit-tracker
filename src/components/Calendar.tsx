@@ -1,52 +1,126 @@
-import type {Habit} from "../types"
-import React, {useState} from "react"
+import type { Habit } from "../types"
+import React, { useState } from "react"
 
 interface CalendarProps {
     habits: Habit[],
     onDeleteHabit: (id: string) => void
     onCompleteHabit: (id: string, date: string) => void
+    isAddingHabit: boolean
+    setIsAddingHabit: (value: boolean) => void
+    onAddHabit: (name: string) => void
+    onSaveEdit: (id: string, name: string) => void
 }
 
-function Calendar({habits, onDeleteHabit, onCompleteHabit}: CalendarProps) {
-    const [currentDate, setCurrentDate] = useState(new Date())
-    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate()
-    const days = Array.from({length: daysInMonth}, (_, i) => i + 1)
+function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIsAddingHabit, onAddHabit, onSaveEdit }: CalendarProps) {
+    const [newHabitName, setNewHabitName] = useState('')
+    const [editingHabitId, setEditingHabitId] = useState<string | null>(null)
+    const [editHabitName, setEditHabitName] = useState('')
+    const [hoveredHabitId, setHoveredHabitId] = useState<string | null>(null)
 
-    function handlePrevMonth() {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))
+    const [currentDate, setCurrentDate] = useState(() => {
+        const today = new Date()
+        const startOfWeek = new Date(today)
+        startOfWeek.setDate(today.getDate() - today.getDay())
+        return startOfWeek
+    })
+
+    const days = Array.from({ length: 7 }, (_, i) => {
+        const day = new Date(currentDate)
+        day.setDate(currentDate.getDate() + i)
+        return day
+    })
+
+    function handlePrevWeek() {
+        const prevWeek = new Date(currentDate)
+        prevWeek.setDate(prevWeek.getDate() - 7)
+        setCurrentDate(prevWeek)
     }
 
-    function handleNextMonth() {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))
+    function handleNextWeek() {
+        const nextWeek = new Date(currentDate)
+        nextWeek.setDate(nextWeek.getDate() + 7)
+        setCurrentDate(nextWeek)
     }
+
+    function addNewHabit() {
+        onAddHabit(newHabitName)
+        setNewHabitName('')
+    }
+
+    function handleStartEditing(id: string, name: string) {
+        setEditingHabitId(id)
+        setEditHabitName(name)
+    }
+
+    const dateRange = `${days[0].toLocaleString('default', { month: 'short', day: 'numeric' })} - ${days[6].toLocaleString('default', { month: 'short', day: 'numeric' })}`
 
     return (
         <>
             <div id="month_header_container" className="flex justify-between max-w-200 items-center mx-auto my-5">
-                <button className="navigation-button prev" onClick={handlePrevMonth}>←</button>
-                <h2 id="month" className="font-display text-3xl xl:text-6xl lg:text-5xl md:text-4xl">{currentDate.toLocaleString('default', {month: 'long', year: 'numeric'})}</h2>
-                <button className="navigation-button next" onClick={handleNextMonth}>→</button>
+                <button className="navigation-button prev" onClick={handlePrevWeek}>←</button>
+                <h2 id="week" className="font-display text-3xl xl:text-6xl lg:text-5xl md:text-4xl">{dateRange}</h2>
+                <button className="navigation-button next" onClick={handleNextWeek}>→</button>
             </div>
-            <div id="habit_grid" className="grid border-t border-l border-subtle" style={{ gridTemplateColumns: `200px repeat(${daysInMonth}, 1fr)` }}>
+            <div id="habit_grid" className="grid border-t border-l border-subtle" style={{ gridTemplateColumns: `200px repeat(7, 1fr)` }}>
                 <div className="border-r border-b border-subtle"></div>
-                {days.map(day => <div className="day flex items-center justify-center border-r border-b border-subtle" key={day}><span>{day}</span></div>)}
+                {days.map(day => <div className="day flex items-center justify-center border-r border-b border-subtle" key={day.getDate()}>
+                    <span>{day.toLocaleString('default', { weekday: 'short' })}</span>
+                    <span>{day.getDate()}</span>
+                </div>
+                )}
                 {habits.map(habit => (
                     <React.Fragment key={habit.id}>
-                        <div className="habit-grid-name border-r border-b border-subtle">{habit.name}</div>
+                        <div className="habit-grid-name border-r border-b border-subtle" onMouseEnter={() => setHoveredHabitId(habit.id)} onMouseLeave={() => setHoveredHabitId(null)}>
+                            {editingHabitId === habit.id ?
+                                <input 
+                                    autoFocus 
+                                    className="w-full h-full"
+                                    value={editHabitName} 
+                                    onChange={(e) => setEditHabitName(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            onSaveEdit(habit.id, editHabitName)
+                                            setEditingHabitId(null)
+                                        }
+                                    }}
+                                />
+                                : habit.name
+                            }
+                            {hoveredHabitId === habit.id && 
+                                <div id="habit_button_container">
+                                    <button onClick={() => onDeleteHabit(habit.id)}>X</button> 
+                                    <button onClick={() => handleStartEditing(habit.id, habit.name)}>E</button>
+                                </div>
+                            }
+                        </div>
                         {days.map(day => {
-                            const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`
+                            const date = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`
                             return (
-                                <div className="habit-cell flex items-center justify-center border-r border-b border-subtle" key={day} onClick={() => onCompleteHabit(habit.id, date)}>
+                                <div className="habit-cell flex items-center justify-center border-r border-b border-subtle min-h-12" key={day.getDate()} onClick={() => onCompleteHabit(habit.id, date)}>
                                     {habit.completedDates.includes(date) ? '✓' : ''}
                                 </div>
                             )
                         })}
                     </React.Fragment>
                 ))}
+                {isAddingHabit ?
+                    <React.Fragment>
+                        <input autoFocus className="w-full min-h-12" value={newHabitName} onChange={(e) => setNewHabitName(e.target.value)} 
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') addNewHabit()
+                            }}></input>
+                            {days.map(day => (
+                                <div className="habit-cell border-r border-b border-subtle min-h-12" key={day.getDate()}></div>
+                            ))}
+                    </React.Fragment>
+                    : null}
+                <button onClick={() => {
+                    setIsAddingHabit(true)
+                }}>+</button>
             </div>
         </>
     )
-    
+
 }
 
 export default Calendar

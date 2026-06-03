@@ -1,6 +1,5 @@
-import AddHabitForm from "./components/AddHabitForm"
-import type {Habit} from "./types"
-import {useState, useEffect} from "react"
+import type { Habit } from "./types"
+import { useState, useEffect } from "react"
 import Calendar from "./components/Calendar"
 
 function App() {
@@ -29,9 +28,13 @@ function App() {
   }
 
   function handleCompleteHabit(id: string, date: string) {
-    setHabits(habits.map(habit => habit.id === id 
-                        ? {...habit, completedDates: habit.completedDates.includes(date) ? habit.completedDates.filter(d => d !==date) : [...habit.completedDates, date]} 
-                        : habit))
+    setHabits(habits.map(habit => habit.id === id
+      ? { ...habit, completedDates: habit.completedDates.includes(date) ? habit.completedDates.filter(d => d !== date) : [...habit.completedDates, date] }
+      : habit))
+  }
+
+  function handleSaveEdit(id: string, name: string) {
+    setHabits(habits.map(habit => habit.id === id ? {...habit, name: name} : habit))
   }
 
   useEffect(() => {
@@ -47,7 +50,7 @@ function App() {
           <button onClick={() => setIsAddingHabit(true)}>+</button>
         </div>
       ) : (
-        <Calendar habits={habits} onDeleteHabit={handleDeleteHabit} onCompleteHabit={handleCompleteHabit} />
+        <Calendar habits={habits} onDeleteHabit={handleDeleteHabit} onCompleteHabit={handleCompleteHabit} onAddHabit={handleAddHabit} isAddingHabit={isAddingHabit} setIsAddingHabit={setIsAddingHabit} onSaveEdit={handleSaveEdit}/>
       )}
     </div>
   )
