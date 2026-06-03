@@ -1,5 +1,6 @@
 import type { Habit } from "../types"
 import React, { useState } from "react"
+import {calculateStreak} from "../utils.ts"
 
 interface CalendarProps {
     habits: Habit[],
@@ -53,7 +54,9 @@ function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIs
     }
 
     const dateRange = `${days[0].toLocaleString('default', { month: 'short', day: 'numeric' })} - ${days[6].toLocaleString('default', { month: 'short', day: 'numeric' })}`
-
+    const todaysDate = new Date()
+    todaysDate.setHours(0, 0, 0, 0)
+    
     return (
         <>
             <div id="month_header_container" className="flex justify-between max-w-200 items-center mx-auto my-5">
@@ -68,41 +71,45 @@ function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIs
                     <span>{day.getDate()}</span>
                 </div>
                 )}
-                {habits.map(habit => (
-                    <React.Fragment key={habit.id}>
-                        <div className="habit-grid-name border-r border-b border-subtle" onMouseEnter={() => setHoveredHabitId(habit.id)} onMouseLeave={() => setHoveredHabitId(null)}>
-                            {editingHabitId === habit.id ?
-                                <input 
-                                    autoFocus 
-                                    className="w-full h-full"
-                                    value={editHabitName} 
-                                    onChange={(e) => setEditHabitName(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            onSaveEdit(habit.id, editHabitName)
-                                            setEditingHabitId(null)
-                                        }
-                                    }}
-                                />
-                                : habit.name
-                            }
-                            {hoveredHabitId === habit.id && 
-                                <div id="habit_button_container">
-                                    <button onClick={() => onDeleteHabit(habit.id)}>X</button> 
-                                    <button onClick={() => handleStartEditing(habit.id, habit.name)}>E</button>
-                                </div>
-                            }
-                        </div>
-                        {days.map(day => {
-                            const date = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`
-                            return (
-                                <div className="habit-cell flex items-center justify-center border-r border-b border-subtle min-h-12" key={day.getDate()} onClick={() => onCompleteHabit(habit.id, date)}>
-                                    {habit.completedDates.includes(date) ? '✓' : ''}
-                                </div>
-                            )
-                        })}
-                    </React.Fragment>
-                ))}
+                {habits.map(habit => {
+                    const streak = calculateStreak(habit.completedDates)
+
+                    return (
+                        <React.Fragment key={habit.id}>
+                            <div className="habit-grid-name border-r border-b border-subtle" onMouseEnter={() => setHoveredHabitId(habit.id)} onMouseLeave={() => setHoveredHabitId(null)}>
+                                {editingHabitId === habit.id ?
+                                    <input 
+                                        autoFocus 
+                                        className="w-full h-full"
+                                        value={editHabitName} 
+                                        onChange={(e) => setEditHabitName(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                onSaveEdit(habit.id, editHabitName)
+                                                setEditingHabitId(null)
+                                            }
+                                        }}
+                                    />
+                                    : habit.name
+                                } {streak}
+                                {hoveredHabitId === habit.id && 
+                                    <div id="habit_button_container">
+                                        <button onClick={() => onDeleteHabit(habit.id)}>X</button> 
+                                        <button onClick={() => handleStartEditing(habit.id, habit.name)}>E</button>
+                                    </div>
+                                }
+                            </div>
+                            {days.map(day => {
+                                const date = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`
+                                return (
+                                    <div className={`habit-cell flex items-center justify-center border-r border-b border-subtle min-h-12 ${new Date(date) > todaysDate ? 'opacity-30' : ''}`} key={day.getDate()} onClick={() => { if (new Date(date) <= todaysDate) onCompleteHabit(habit.id, date)}}>
+                                        {habit.completedDates.includes(date) ? '✓' : ''}
+                                    </div>
+                                )
+                            })}
+                        </React.Fragment>
+                    )
+                })}
                 {isAddingHabit ?
                     <React.Fragment>
                         <input autoFocus className="w-full min-h-12" value={newHabitName} onChange={(e) => setNewHabitName(e.target.value)} 
