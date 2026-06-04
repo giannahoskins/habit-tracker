@@ -40,6 +40,11 @@ function HabitSuggestionModal({habits, isOpen, onClose, onAddHabit}: ModalProps)
         setSuggestions(parsed)
     }
 
+    function handleAddSuggestion(suggestion: string) {
+        onAddHabit(suggestion)
+        setSuggestions(suggestions.filter(s => s !== suggestion))
+    }
+
     return (
         <>
             {isOpen && (
@@ -48,7 +53,10 @@ function HabitSuggestionModal({habits, isOpen, onClose, onAddHabit}: ModalProps)
                     <button onClick={() => getSuggestions()}>Submit</button>
                     {suggestions.map(suggestion => {
                         return (
-                            <p key={suggestion}>{suggestion}</p>
+                            <div className="habit-suggestion" key={suggestion}>
+                                <p>{suggestion}</p>
+                                <button onClick={() => handleAddSuggestion(suggestion)}>Add Suggestion</button>
+                            </div>
                         )
                     })}
                 </>

@@ -57,7 +57,7 @@ function App() {
       <button onClick={() => setIsModalOpen(true)}>Open Modal</button>
       {isModalOpen === true &&
         <>
-          <HabitSuggestionModal isOpen={true} />
+          <HabitSuggestionModal isOpen={true} onAddHabit={handleAddHabit} />
           <button onClick={() => setIsModalOpen(false)}>Close Modal</button>
         </>
       }
