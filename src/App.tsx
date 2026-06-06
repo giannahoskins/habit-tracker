@@ -2,6 +2,7 @@ import type { Habit } from "./types"
 import { useState, useEffect } from "react"
 import Calendar from "./components/Calendar"
 import HabitSuggestionModal from "./components/HabitSuggestionModal"
+import HabitChart from "./components/HabitChart"
 
 function App() {
   const [isAddingHabit, setIsAddingHabit] = useState(false)
@@ -19,7 +20,8 @@ function App() {
     const newHabit: Habit = {
       id: crypto.randomUUID(),
       name: habitName,
-      completedDates: []
+      completedDates: [],
+      createdOn: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`
     }
 
     setHabits([...habits, newHabit])
@@ -45,7 +47,7 @@ function App() {
 
   return (
     <div className="bg-background min-h-screen text-text">
-      <h1>Habit Tracker</h1>
+      <h1 className="uppercase tracking-[4px] text-center text-[22px0] font-semibold pt-[6vw] pb-[4vw]">Steadfast</h1>
       {habits.length === 0 && !isAddingHabit ? (
         <div>
           <p>No habits have been added yet. Click '+' to add a habit</p>
@@ -61,6 +63,7 @@ function App() {
           <button onClick={() => setIsModalOpen(false)}>Close Modal</button>
         </>
       }
+      <HabitChart habits={habits}/>
     </div>
   )
 }

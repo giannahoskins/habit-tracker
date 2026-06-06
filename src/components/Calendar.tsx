@@ -1,6 +1,7 @@
 import type { Habit } from "../types"
 import React, { useState } from "react"
 import {calculateStreak} from "../utils.ts"
+import { motion } from "motion/react"
 
 interface CalendarProps {
     habits: Habit[],
@@ -53,23 +54,28 @@ function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIs
         setEditHabitName(name)
     }
 
+    const currentYear = `${days[0].getFullYear()}`
     const dateRange = `${days[0].toLocaleString('default', { month: 'short', day: 'numeric' })} - ${days[6].toLocaleString('default', { month: 'short', day: 'numeric' })}`
     const todaysDate = new Date()
     todaysDate.setHours(0, 0, 0, 0)
     
     return (
         <>
+            <div className="text-center">
+                <span className="block">{currentYear}</span>
+            </div>
             <div id="month_header_container" className="flex justify-between max-w-200 items-center mx-auto my-5">
                 <button className="navigation-button prev" onClick={handlePrevWeek}>←</button>
-                <h2 id="week" className="font-display text-3xl xl:text-6xl lg:text-5xl md:text-4xl">{dateRange}</h2>
+                <h2 id="week" className="text-3xl xl:text-6xl lg:text-5xl md:text-4xl">{dateRange}</h2>
                 <button className="navigation-button next" onClick={handleNextWeek}>→</button>
             </div>
             <div id="habit_grid" className="grid border-t border-l border-subtle" style={{ gridTemplateColumns: `200px repeat(7, 1fr)` }}>
                 <div className="border-r border-b border-subtle"></div>
-                {days.map(day => <div className="day flex items-center justify-center border-r border-b border-subtle" key={day.getDate()}>
-                    <span>{day.toLocaleString('default', { weekday: 'short' })}</span>
-                    <span>{day.getDate()}</span>
-                </div>
+                {days.map(day => 
+                    <div className="day flex flex-col items-center justify-center border-r border-b border-subtle" key={day.getDate()}>
+                        <span className="block">{day.toLocaleString('default', { month: 'numeric', day: 'numeric'} )}</span>
+                        <span className="block">{day.toLocaleString('default', { weekday: 'short' })}</span>
+                    </div>
                 )}
                 {habits.map(habit => {
                     const streak = calculateStreak(habit.completedDates)
@@ -91,7 +97,7 @@ function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIs
                                         }}
                                     />
                                     : habit.name
-                                } {streak}
+                                }
                                 {hoveredHabitId === habit.id && 
                                     <div id="habit_button_container">
                                         <button onClick={() => onDeleteHabit(habit.id)}>X</button> 
@@ -103,7 +109,7 @@ function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIs
                                 const date = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`
                                 return (
                                     <div className={`habit-cell flex items-center justify-center border-r border-b border-subtle min-h-12 ${new Date(date) > todaysDate ? 'opacity-30' : ''}`} key={day.getDate()} onClick={() => { if (new Date(date) <= todaysDate) onCompleteHabit(habit.id, date)}}>
-                                        {habit.completedDates.includes(date) ? '✓' : ''}
+                                        {habit.completedDates.includes(date) ? <div className="w-full h-full bg-accent p-[2.5]"></div> : ''}
                                     </div>
                                 )
                             })}
