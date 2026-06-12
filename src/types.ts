@@ -3,4 +3,5 @@ export interface Habit {
     name: string
     completedDates: string[]
     createdOn: string
+    color: string
 }

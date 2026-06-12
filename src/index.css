@@ -1,14 +1,47 @@
 @import "tailwindcss";
 
 @theme {
-    --color-background: #0f0f13;
+    /* app colors */
+    --color-background: #111116;
     --color-surface: #1a1a24;
     --color-accent: #7c6af7;
     --color-text: #e8e8f0;
     --color-subtle: #6b6b80;
+
+    /* habit colors */
+    --color-habit-1: #7c6af7;
+    --color-habit-2: #f7926a;
+    --color-habit-3: #6af7c8;
+    --color-habit-4: #f76a8e;
+    --color-habit-5: #f7d96a;
+    --color-habit-6: #6aaff7;
+
+    /* fonts */
     --font-body: "DM Sans", sans-serif;
 }
 
 body {
     font-family: var(--font-body);
+    background: var(--color-background);
+    color: var(--color-text);
+}
+
+button:hover {
+    @apply cursor-pointer;
+}
+
+.header-text {
+    @apply text-[50px] font-semibold tracking-[3px] leading-[1.1];
+}
+
+.body-text {
+    @apply text-[20px] text-subtle;
+}
+
+.purple-button {
+    @apply bg-accent px-6 py-2 rounded whitespace-nowrap border border-accent hover:brightness-110 transition duration-200;
+}
+
+.ghost-habit {
+    @apply flex flex-col bg-surface/30 my-3 py-5 pl-5 pr-37  rounded-tr-xl rounded-br-xl border-l-3;
 }

@@ -11,9 +11,11 @@ interface CalendarProps {
     setIsAddingHabit: (value: boolean) => void
     onAddHabit: (name: string) => void
     onSaveEdit: (id: string, name: string) => void
+    showStats: boolean
+    setShowStats: (value: boolean) => void
 }
 
-function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIsAddingHabit, onAddHabit, onSaveEdit }: CalendarProps) {
+function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIsAddingHabit, onAddHabit, onSaveEdit, showStats, setShowStats }: CalendarProps) {
     const [newHabitName, setNewHabitName] = useState('')
     const [editingHabitId, setEditingHabitId] = useState<string | null>(null)
     const [editHabitName, setEditHabitName] = useState('')
@@ -68,6 +70,7 @@ function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIs
                 <button className="navigation-button prev" onClick={handlePrevWeek}>←</button>
                 <h2 id="week" className="text-3xl xl:text-6xl lg:text-5xl md:text-4xl">{dateRange}</h2>
                 <button className="navigation-button next" onClick={handleNextWeek}>→</button>
+                <button onClick={() => setShowStats(true)}>Stats</button>
             </div>
             <div id="habit_grid" className="grid border-t border-l border-subtle" style={{ gridTemplateColumns: `200px repeat(7, 1fr)` }}>
                 <div className="border-r border-b border-subtle"></div>
@@ -82,7 +85,7 @@ function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIs
 
                     return (
                         <React.Fragment key={habit.id}>
-                            <div className="habit-grid-name border-r border-b border-subtle" onMouseEnter={() => setHoveredHabitId(habit.id)} onMouseLeave={() => setHoveredHabitId(null)}>
+                            <div style={{ color: habit.color }} className="habit-grid-name border-r border-b border-subtle" onMouseEnter={() => setHoveredHabitId(habit.id)} onMouseLeave={() => setHoveredHabitId(null)}>
                                 {editingHabitId === habit.id ?
                                     <input 
                                         autoFocus 
@@ -109,7 +112,7 @@ function Calendar({ habits, onDeleteHabit, onCompleteHabit, isAddingHabit, setIs
                                 const date = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`
                                 return (
                                     <div className={`habit-cell flex items-center justify-center border-r border-b border-subtle min-h-12 ${new Date(date) > todaysDate ? 'opacity-30' : ''}`} key={day.getDate()} onClick={() => { if (new Date(date) <= todaysDate) onCompleteHabit(habit.id, date)}}>
-                                        {habit.completedDates.includes(date) ? <div className="w-full h-full bg-accent p-[2.5]"></div> : ''}
+                                        {habit.completedDates.includes(date) ? <div style={{ backgroundColor: habit.color }} className="w-8/10 h-7/10 rounded"></div> : ''}
                                     </div>
                                 )
                             })}

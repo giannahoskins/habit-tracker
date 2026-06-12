@@ -1,4 +1,4 @@
-import { Bar, BarChart, Tooltip, XAxis, YAxis } from 'recharts';
+import { ResponsiveContainer, Bar, BarChart, Tooltip, XAxis, YAxis } from 'recharts';
 import { useState } from "react"
 import type { Habit } from "../types"
 
@@ -18,14 +18,14 @@ export function HabitChart({habits}: HabitChartProps) {
     })
 
     return (
-        <>
-            <BarChart width={800} height={500} data={data}>
-                <XAxis dataKey="name" label={{ position: 'insideBottomRight', value: 'XAxis title', offset: -10 }} />
-                <YAxis label={{ position: 'insideTopLeft', value: 'YAxis title', angle: -90, dy: 60 }} />
+        <ResponsiveContainer width="100%" height={650}>
+            <BarChart width={800} height={500}  data={data} margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
+                <XAxis dataKey="name" label={{ position: 'insideBottomRight', value: 'Habits', offset: -10 }} />
+                <YAxis label={{ position: 'center', textAnchor: 'middle', value: 'Completion Rate', angle: -90 }} />
                 <Bar dataKey="completionRate" fill="#8884d8" />
                 <Tooltip />
             </BarChart>
-        </>
+        </ResponsiveContainer>
     )
 }
 

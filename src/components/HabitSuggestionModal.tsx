@@ -1,5 +1,6 @@
 import type { Habit } from "../types"
 import React, { useState } from "react"
+import { IconX, IconPlus, IconSparkles } from '@tabler/icons-react'
 
 interface ModalProps {
     habits: Habit[],
@@ -49,16 +50,26 @@ function HabitSuggestionModal({habits, isOpen, onClose, onAddHabit}: ModalProps)
         <>
             {isOpen && (
                 <>
-                    <input value={input} onChange={(e) => setInput(e.target.value)}></input>
-                    <button onClick={() => getSuggestions()}>Submit</button>
-                    {suggestions.map(suggestion => {
-                        return (
-                            <div className="habit-suggestion" key={suggestion}>
-                                <p>{suggestion}</p>
-                                <button onClick={() => handleAddSuggestion(suggestion)}>Add Suggestion</button>
+                    <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+                    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface p-8 md:p-11 rounded-xl z-10 min-w-[90%] sm:min-w-[500px]">
+                        <h2 className="header-text mb-8">What are you working toward?</h2>
+                        <p className="body-text mb-8">Tell us your goal and we'll suggest habits to help you get there.</p>
+                        {suggestions.length > 0 && (
+                            <div className="suggestions-container mb-10">
+                                {suggestions.map(suggestion => (
+                                    <div className="habit-suggestion grid grid-cols-[1fr_auto] my-3 items-center" key={suggestion}>
+                                        <p className="body-text text-text!">{suggestion}</p>
+                                        <button className="purple-button max-w-[75px] ml-5" onClick={() => handleAddSuggestion(suggestion)}><IconPlus className="mx-auto" /></button>
+                                    </div>
+                                ))}
                             </div>
-                        )
-                    })}
+                        )}
+                        <div className="w-[100%] md:flex justify-end gap-3 items-center">
+                            <input value={input} className="border border-subtle rounded px-3 py-2 w-[100%]" placeholder="e.g. I want to get healthier, sleep better, etc." onChange={(e) => setInput(e.target.value)}></input>
+                            <button onClick={() => getSuggestions()} className="purple-button mx-auto mt-5 md:my-0">Suggest habits</button>
+                        </div>
+                        <button onClick={onClose} className="absolute top-2.5 right-2.5"><IconX stroke={1} className="w-6"/></button>
+                    </div>
                 </>
             )}
         </>

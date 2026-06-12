@@ -3,10 +3,21 @@ import { useState, useEffect } from "react"
 import Calendar from "./components/Calendar"
 import HabitSuggestionModal from "./components/HabitSuggestionModal"
 import HabitChart from "./components/HabitChart"
+import { IconPlus, IconSparkles, IconX } from '@tabler/icons-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 function App() {
   const [isAddingHabit, setIsAddingHabit] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showStats, setShowStats] = useState(false)
+  const habitColors = [
+    '#a99af9',
+    '#f7926a', 
+    '#6af7c8',
+    '#f76a8e',
+    '#f7d96a',
+    '#6aaff7'
+  ]
 
   const [habits, setHabits] = useState<Habit[]>(() => {
     try {
@@ -21,7 +32,8 @@ function App() {
       id: crypto.randomUUID(),
       name: habitName,
       completedDates: [],
-      createdOn: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`
+      createdOn: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`,
+      color: habitColors[habits.length % habitColors.length]
     }
 
     setHabits([...habits, newHabit])
@@ -46,24 +58,62 @@ function App() {
   }, [habits])
 
   return (
-    <div className="bg-background min-h-screen text-text">
-      <h1 className="uppercase tracking-[4px] text-center text-[22px0] font-semibold pt-[6vw] pb-[4vw]">Steadfast</h1>
+    <div className="min-h-screen max-w-[1200px] mx-auto px-[5vw]">
+      {habits.length === 0 && !isAddingHabit && (
+        <>
+          <div className="absolute inset-0 [background-image:radial-gradient(circle,#ffffff10_1px,transparent_1px)] [background-size:20px_20px]" />
+          <div className="absolute inset-0 [background:radial-gradient(ellipse_at_center,transparent_40%,#111116_100%)] pointer-events-none" />
+        </>
+      )}
+      <h1 className="text-subtle uppercase tracking-[15px] text-[22px0] font-semibold pt-[6vw] pb-[4vw]">Steadfast</h1>
       {habits.length === 0 && !isAddingHabit ? (
-        <div>
-          <p>No habits have been added yet. Click '+' to add a habit</p>
-          <button onClick={() => setIsAddingHabit(true)}>+</button>
+        <div className="no-habits flex justify-between relative">
+          <div className="no-habits-text-container">
+            <span className="text-subtle uppercase tracking-[3px]">Day 0</span>
+            <h2 className="header-text max-w-75">Your <span className="bg-gradient-to-r from-[#a29bfe] to-[#dfe6fd] bg-clip-text text-transparent">streak</span> starts here.</h2>
+            <p className="body-text max-w-100 mt-5">Track the habits that move you forward. One day at a time.</p>
+            <div className="flex mt-8">
+              <button className="flex items-center purple-button mr-3" onClick={() => setIsAddingHabit(true)}><IconPlus size={16} /> <span className="ml-2.5 font-medium">Add habit</span></button>
+              <button className="flex items-center  text-accent border border-surface px-6 py-2 rounded transition duration-200 hover:bg-surface hover:border-accent" onClick={() => setIsModalOpen(true)}><IconSparkles size={16} /><span className="ml-2.5 font-medium">AI suggest</span></button>
+            </div>
+          </div>
+          <div className="ghost-habits-container hidden md:block">
+            <div className="ghost-habit border-habit-1">
+              <span className="font-medium">Morning Run</span>
+              <span className="text-subtle">0 Day Streak</span>
+            </div>
+            <div className="ghost-habit border-habit-2 mr-10">
+              <span className="font-medium">Drink water</span>
+              <span className="text-subtle">0 Day Streak</span>
+            </div>
+            <div className="ghost-habit border-habit-3 mr-20">
+              <span className="font-medium">Read 20 mins</span>
+              <span className="text-subtle">0 Day Streak</span>
+            </div>
+          </div>
         </div>
       ) : (
-        <Calendar habits={habits} onDeleteHabit={handleDeleteHabit} onCompleteHabit={handleCompleteHabit} onAddHabit={handleAddHabit} isAddingHabit={isAddingHabit} setIsAddingHabit={setIsAddingHabit} onSaveEdit={handleSaveEdit}/>
+        <Calendar habits={habits} onDeleteHabit={handleDeleteHabit} onCompleteHabit={handleCompleteHabit} onAddHabit={handleAddHabit} isAddingHabit={isAddingHabit} setIsAddingHabit={setIsAddingHabit} onSaveEdit={handleSaveEdit} setShowStats={setShowStats}/>
       )}
-      <button onClick={() => setIsModalOpen(true)}>Open Modal</button>
       {isModalOpen === true &&
-        <>
-          <HabitSuggestionModal isOpen={true} onAddHabit={handleAddHabit} />
-          <button onClick={() => setIsModalOpen(false)}>Close Modal</button>
-        </>
+          <HabitSuggestionModal isOpen={true} onAddHabit={handleAddHabit} onClose={() => setIsModalOpen(false)} />
       }
-      <HabitChart habits={habits}/>
+      <AnimatePresence>
+        {showStats && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 20 }}
+            style={{ position: 'fixed', right: 0, top: 0, height: '100vh', width: '100vw' }}
+            className="bg-surface"
+          >
+            <h2 className="text-[44px] mx-2.5 my-7.5 text-center">Habit Stats</h2>
+            <HabitChart habits={habits} />
+            <button className="absolute top-5 right-5" onClick={() => setShowStats(false)}><IconX stroke={1} className="w-6"/></button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
