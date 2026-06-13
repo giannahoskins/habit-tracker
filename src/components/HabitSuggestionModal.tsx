@@ -33,6 +33,7 @@ function HabitSuggestionModal({isOpen, onClose, onAddHabit}: ModalProps) {
         })
 
         const data = await response.json()
+        console.log(data)
         const text = data.content[0].text.replace(/```json\n?|\n?```/g, '').trim()
         const parsed = JSON.parse(text)
         setSuggestions(parsed)
