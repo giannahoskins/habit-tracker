@@ -16,6 +16,4 @@ export default defineConfig({
       }
     }
   },
-
-  base: '/steadfast-habit-tracker/'
 })
