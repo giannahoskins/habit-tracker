@@ -1,5 +1,5 @@
-export default async (req) => {
-    const body = await req.json()
+exports.handler = async function(event) {
+    const body = JSON.parse(event.body)
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -12,7 +12,9 @@ export default async (req) => {
     })
 
     const data = await response.json()
-    return Response.json(data)
+    
+    return {
+        statusCode: 200,
+        body: JSON.stringify(data)
+    }
 }
-
-export const config = { path: '/api/claude' }
