@@ -7,6 +7,12 @@
     --color-accent: #7c6af7;
     --color-text: #e8e8f0;
     --color-subtle: #6b6b80;
+    --color-border: #1e1e28;
+
+    /* calendar colors */
+    --color-surface-raised: #16161e;
+    --color-dates: #5a5a72;
+    --color-days: #2a2a3a;
 
     /* habit colors */
     --color-habit-1: #7c6af7;
@@ -39,7 +45,29 @@ button:hover {
 }
 
 .purple-button {
-    @apply bg-accent px-6 py-2 rounded whitespace-nowrap border border-accent hover:brightness-110 transition duration-200;
+    @apply bg-accent px-6 py-2 rounded whitespace-nowrap border border-accent transition duration-200;
+    position: relative;
+    overflow: hidden;
+}
+
+.purple-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.9s ease;
+}
+
+.purple-button:hover::after {
+    left: 150%;
+}
+
+.purple-button > * {
+    position: relative;
+    z-index: 1;
 }
 
 .ghost-habit {

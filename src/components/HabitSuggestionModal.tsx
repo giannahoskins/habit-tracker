@@ -64,11 +64,15 @@ function HabitSuggestionModal({habits, isOpen, onClose, onAddHabit}: ModalProps)
                                 ))}
                             </div>
                         )}
-                        <div className="w-[100%] md:flex justify-end gap-3 items-center">
-                            <input value={input} className="border border-subtle rounded px-3 py-2 w-[100%]" placeholder="e.g. I want to get healthier, sleep better, etc." onChange={(e) => setInput(e.target.value)}></input>
-                            <button onClick={() => getSuggestions()} className="purple-button mx-auto mt-5 md:my-0">Suggest habits</button>
+                        <div className="w-[100%] flex flex-nowrap items-center justify-end gap-3 items-center">
+                            <input value={input} className="border border-subtle rounded px-3 py-2 flex-1 w-full" placeholder="e.g. I want to get healthier, sleep better, etc." onChange={(e) => setInput(e.target.value)}></input>
+                            <button onClick={() => getSuggestions()} className="purple-button !p-3 flex items-center md:my-0">
+                                <span className="flex items-center relative z-10">
+                                    <IconSparkles size={16} />
+                                </span>
+                            </button>
                         </div>
-                        <button onClick={onClose} className="absolute top-2.5 right-2.5"><IconX stroke={1} className="w-6"/></button>
+                        <button onClick={onClose} className="absolute top-2.5 right-2.5 shrink-0"><IconX stroke={1} className="w-6"/></button>
                     </div>
                 </>
             )}
